@@ -37,6 +37,7 @@ const App = () => {
 
     const person = persons.find((person) => person.name === newName);
 
+    // If the person is already in the DB, update their number
     if (
       person &&
       window.confirm(
@@ -64,6 +65,7 @@ const App = () => {
       return;
     }
 
+    // Else if the person doesn't exist, create them
     const newPerson = { name: newName, number: newNumber };
 
     personService.create(newPerson).then((returnedPerson) => {
@@ -80,9 +82,9 @@ const App = () => {
       personService
         .remove(id)
         .then(() => setPersons(persons.filter((p) => p.id !== id)));
+      setErrorMessage({ error: true, message: `Deleted ${person.name}` });
+      setTimeout(() => setErrorMessage(initialErrorMessage), 4000);
     }
-    setErrorMessage({ error: true, message: `Deleted ${person.name}` });
-    setTimeout(() => setErrorMessage(initialErrorMessage), 4000);
   };
 
   return (
