@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Persons({ persons, filter }) {
+export default function Persons({ persons, filter, onDelete }) {
   const filteredPersons = persons.filter((person) =>
     person.name.toLowerCase().includes(filter?.toLowerCase())
   );
@@ -8,7 +8,8 @@ export default function Persons({ persons, filter }) {
   const personsList = filteredPersons.map((person) => {
     return (
       <li key={person.name}>
-        {person.name} {person.number}
+        {person.name} {person.number}{' '}
+        <button onClick={() => onDelete(person.id)}>delete</button>
       </li>
     );
   });
