@@ -68,9 +68,15 @@ const App = () => {
     // Else if the person doesn't exist, create them
     const newPerson = { name: newName, number: newNumber };
 
-    personService.create(newPerson).then((returnedPerson) => {
-      setPersons(persons.concat(returnedPerson));
-    });
+    personService
+      .create(newPerson)
+      .then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+      })
+      .catch((error) => {
+        setErrorMessage({ error: true, message: error.response.data.error });
+        setTimeout(() => setErrorMessage(initialErrorMessage), 10000);
+      });
     setErrorMessage({ error: false, message: `Added ${newName}` });
     setTimeout(() => setErrorMessage(initialErrorMessage), 4000);
   };
