@@ -99,13 +99,13 @@ test('updating likes works', async () => {
   const response = await api.get('/api/blogs');
   const newBlog = { ...response.body[0], likes: 420 };
 
-  console.log(newBlog);
+  // console.log(newBlog);
   const res = await api.put(`/api/blogs/${newBlog.id}`).send(newBlog);
-  console.log('updated blog: ', res.body);
+  // console.log('updated blog: ', res.body);
 
   const response2 = await api.get('/api/blogs');
 
-  console.log(response2.body);
+  // console.log(response2.body);
   expect(response2.body[0].likes).toBe(newBlog.likes);
 });
 
