@@ -3,6 +3,8 @@ const supertest = require('supertest');
 const app = require('../app');
 const api = supertest(app);
 const Blog = require('../models/blog');
+const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 const initialBlogs = [
   {
     title: 'test blog 1',
@@ -19,10 +21,22 @@ const initialBlogs = [
 ];
 
 beforeEach(async () => {
+  await User.deleteMany({});
+
+  const passwordHash = await bcrypt.hash('testi', 10);
+
+  const user = new User({
+    username: 'test',
+    name: 'testi jäbä',
+    passwordHash,
+  });
+
+  await user.save();
+
   await Blog.deleteMany({});
-  let blogObject = new Blog(initialBlogs[0]);
+  let blogObject = new Blog({ ...initialBlogs[0], user: user.id });
   await blogObject.save();
-  blogObject = new Blog(initialBlogs[1]);
+  blogObject = new Blog({ ...initialBlogs[1], user: user.id });
   await blogObject.save();
 });
 
@@ -39,60 +53,92 @@ test('blog identifier is named id', async () => {
   expect(res.body[0].id).toBeDefined();
 });
 
-test('blogs.length is one more than initial after adding a blog', async () => {
-  const newBlog = {
-    author: 'nönnöönöö',
-    title: 'test',
-    url: 'test',
-    likes: 0,
-  };
+describe('post or delete with token', () => {
+  let testToken;
 
-  await api.post('/api/blogs').send(newBlog);
+  beforeEach(async () => {
+    const loginUser = {
+      username: 'test',
+      password: 'testi',
+    };
 
-  const res = await api.get('/api/blogs');
+    testToken = (await api.post('/api/login').send(loginUser)).body.token;
+  });
 
-  expect(res.body.length).toBe(initialBlogs.length + 1);
-});
+  test('blogs.length is one more than initial after adding a blog', async () => {
+    const newBlog = {
+      author: 'nönnöönöö',
+      title: 'test',
+      url: 'test',
+      likes: 0,
+    };
 
-test('likes defaults to 0', async () => {
-  const newBlog = {
-    author: 'nönnöönöö',
-    title: 'test',
-    url: 'test',
-  };
-  await api.post('/api/blogs').send(newBlog);
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${testToken}`)
+      .send(newBlog);
 
-  const res = await api.get('/api/blogs');
+    const res = await api.get('/api/blogs');
 
-  const newestBlog = res.body[res.body.length - 1];
+    expect(res.body.length).toBe(initialBlogs.length + 1);
+  });
 
-  expect(newestBlog.likes).toBe(0);
-});
+  test('likes defaults to 0', async () => {
+    const newBlog = {
+      author: 'nönnöönöö',
+      title: 'test',
+      url: 'test',
+    };
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${testToken}`)
+      .send(newBlog);
 
-test('post without title returns 400 Bad Request', async () => {
-  const newBlog = {
-    author: 'nönnöönöö',
-    url: 'test',
-    likes: 0,
-  };
-  await api.post('/api/blogs').send(newBlog).expect(400);
-});
+    const res = await api.get('/api/blogs');
 
-test('post without url returns 400 Bad Request', async () => {
-  const newBlog = {
-    author: 'nönnöönöö',
-    title: 'test',
-    likes: 0,
-  };
-  await api.post('/api/blogs').send(newBlog).expect(400);
-});
+    const newestBlog = res.body[res.body.length - 1];
 
-test('deleting by id works', async () => {
-  const getResponse = await api.get('/api/blogs');
-  const blogsBeforeDeleting = getResponse.body;
-  await api.delete(`/api/blogs/${blogsBeforeDeleting[0].id}`);
-  const afterResponse = await api.get('/api/blogs');
-  expect(afterResponse.body.length).toBe(blogsBeforeDeleting.length - 1);
+    expect(newestBlog.likes).toBe(0);
+  });
+
+  test('post without title returns 400 Bad Request', async () => {
+    const newBlog = {
+      author: 'nönnöönöö',
+      url: 'test',
+      likes: 0,
+    };
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${testToken}`)
+      .send(newBlog)
+      .expect(400);
+  });
+
+  test('post without url returns 400 Bad Request', async () => {
+    const newBlog = {
+      author: 'nönnöönöö',
+      title: 'test',
+      likes: 0,
+    };
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${testToken}`)
+      .send(newBlog)
+      .expect(400);
+  });
+
+  test('deleting by id works', async () => {
+    const getResponse = await api.get('/api/blogs');
+    const blogsBeforeDeleting = getResponse.body;
+
+    console.log(blogsBeforeDeleting[0].user);
+    await api
+      .delete(`/api/blogs/${blogsBeforeDeleting[0].id}`)
+      .set('Authorization', `bearer ${testToken}`);
+
+    const afterResponse = await api.get('/api/blogs');
+    expect(afterResponse.body.length).toBe(blogsBeforeDeleting.length - 1);
+  });
 });
 
 test('updating likes works', async () => {
