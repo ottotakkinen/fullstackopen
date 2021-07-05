@@ -20,13 +20,15 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).send({ error: 'malformatted id' });
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message });
+  } else if (error.name === 'JsonWebTokenError') {
+    return response.status(401).send({ error: error.message });
   }
 
   next(error);
 };
 
 const tokenExtractor = (request, response, next) => {
-  let token;
+  let token = undefined;
   const auth = request.get('authorization');
   if (auth && auth.toLowerCase().startsWith('bearer ')) {
     token = auth.substring(7);

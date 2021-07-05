@@ -65,6 +65,32 @@ describe('post or delete with token', () => {
     testToken = (await api.post('/api/login').send(loginUser)).body.token;
   });
 
+  test('blog responds with 401 Unauthorized if no token is provided', async () => {
+    const newBlog = {
+      author: 'nönnöönöö',
+      title: 'test',
+      url: 'test',
+      likes: 0,
+    };
+
+    await api.post('/api/blogs').send(newBlog).expect(401);
+  });
+
+  test('blog responds with 401 if malformed token is provided', async () => {
+    const newBlog = {
+      author: 'nönnöönöö',
+      title: 'test',
+      url: 'test',
+      likes: 0,
+    };
+
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer noeisaleekyltoimitäätokeni`)
+      .send(newBlog)
+      .expect(401);
+  });
+
   test('blogs.length is one more than initial after adding a blog', async () => {
     const newBlog = {
       author: 'nönnöönöö',
@@ -131,7 +157,6 @@ describe('post or delete with token', () => {
     const getResponse = await api.get('/api/blogs');
     const blogsBeforeDeleting = getResponse.body;
 
-    console.log(blogsBeforeDeleting[0].user);
     await api
       .delete(`/api/blogs/${blogsBeforeDeleting[0].id}`)
       .set('Authorization', `bearer ${testToken}`);
@@ -146,9 +171,7 @@ test('updating likes works', async () => {
   const newBlog = { ...response.body[0], likes: 420 };
 
   // console.log(newBlog);
-  const res = await api.put(`/api/blogs/${newBlog.id}`).send(newBlog);
-  // console.log('updated blog: ', res.body);
-
+  await api.put(`/api/blogs/${newBlog.id}`).send(newBlog);
   const response2 = await api.get('/api/blogs');
 
   // console.log(response2.body);
