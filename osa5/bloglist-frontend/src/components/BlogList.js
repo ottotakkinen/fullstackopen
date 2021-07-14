@@ -2,11 +2,24 @@ import React from 'react';
 
 import Blog from './Blog';
 
-export default function BlogList({ blogs, user }) {
+export default function BlogList({
+  blogs,
+  user,
+  handleBlogLike,
+  handleBlogDelete,
+}) {
+  const sortedBlogs = blogs.sort((a, b) => (a.likes <= b.likes ? 1 : -1));
+
   return (
     <div>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+      {sortedBlogs.map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          user={user}
+          handleBlogLike={handleBlogLike}
+          handleBlogDelete={handleBlogDelete}
+        />
       ))}
     </div>
   );

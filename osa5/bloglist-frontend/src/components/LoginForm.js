@@ -9,7 +9,7 @@ export default function LoginForm({
 }) {
   return (
     <form onSubmit={onSubmit}>
-      <h1>Login</h1>
+      <h2>Login</h2>
       <div>
         <label htmlFor="username">Username</label>
         <input

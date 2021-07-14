@@ -22,6 +22,7 @@ export default function NewBlogForm({ user, handleBlogUpdate }) {
     };
 
     const newBlogPost = await blogService.create(user.token, blogPost);
+    console.log(newBlogPost, 'this the new blog post');
     handleBlogUpdate(newBlogPost);
 
     clearInputs();
