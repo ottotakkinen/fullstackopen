@@ -9,15 +9,14 @@ const Blog = ({ blog, user, handleBlogLike, handleBlogDelete }) => {
     setDetailVisibility(!detailVisibility);
   };
 
-  const handleLike = async () => {
-    handleBlogLike(blog.id);
-    await blogService.like(user.token, blog);
+  const handleLike = () => {
+    handleBlogLike({ ...blog });
   };
 
-  const handleBlogDeleteButton = async () => {
+  const handleBlogDeleteButton = () => {
     if (window.confirm(`Delete ${blog.title}?`)) {
       handleBlogDelete(blog.id);
-      await blogService.remove(user.token, blog);
+      blogService.remove(user.token, blog);
     }
   };
 
@@ -29,7 +28,7 @@ const Blog = ({ blog, user, handleBlogLike, handleBlogDelete }) => {
   };
 
   return (
-    <div style={blogStyle}>
+    <div className="blog" style={blogStyle}>
       {blog.title} {blog.author}{' '}
       <button onClick={toggleDetails}>
         {detailVisibility ? 'Close' : 'View'}
@@ -46,7 +45,7 @@ const Blog = ({ blog, user, handleBlogLike, handleBlogDelete }) => {
             <button onClick={handleLike}>Like</button>{' '}
           </p>
           <p>It was added by {blog.user?.name ?? user.name}</p>
-          {blog.user.username === user.username && (
+          {blog.user?.username === user.username && (
             <div>
               <button onClick={handleBlogDeleteButton}>Delete</button>
             </div>

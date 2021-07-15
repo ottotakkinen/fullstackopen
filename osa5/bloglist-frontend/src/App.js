@@ -81,12 +81,13 @@ const App = () => {
     setBlogs((prevState) => [...prevState, newBlog]);
   };
 
-  const handleBlogLike = (id) => {
+  const handleBlogLike = (newBlog) => {
     const updatedBlogs = blogs.map((blog) =>
-      blog.id === id ? { ...blog, likes: blog.likes + 1 } : blog
+      blog.id === newBlog.id ? { ...blog, likes: blog.likes + 1 } : blog
     );
-
     setBlogs(updatedBlogs);
+
+    blogService.like(user.token, newBlog);
   };
 
   const handleBlogDelete = (deletedBlogId) => {
