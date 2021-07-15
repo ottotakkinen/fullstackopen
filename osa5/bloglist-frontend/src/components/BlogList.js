@@ -2,6 +2,8 @@ import React from 'react';
 
 import Blog from './Blog';
 
+// let timeout;
+
 export default function BlogList({
   blogs,
   user,

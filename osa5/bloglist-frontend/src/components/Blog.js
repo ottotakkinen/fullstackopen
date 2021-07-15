@@ -10,19 +10,16 @@ const Blog = ({ blog, user, handleBlogLike, handleBlogDelete }) => {
   };
 
   const handleLike = async () => {
-    const updatedBlog = await blogService.like(user.token, blog);
-    handleBlogLike(updatedBlog);
+    handleBlogLike(blog.id);
+    await blogService.like(user.token, blog);
   };
 
   const handleBlogDeleteButton = async () => {
     if (window.confirm(`Delete ${blog.title}?`)) {
-      console.log('deleting blog');
-      const deletedBlogId = blog.id;
+      handleBlogDelete(blog.id);
       await blogService.remove(user.token, blog);
-      handleBlogDelete(deletedBlogId);
     }
   };
-  console.log('Blog user is now: ', blog.user.name);
 
   const blogStyle = {
     padding: '1em',
@@ -48,7 +45,7 @@ const Blog = ({ blog, user, handleBlogLike, handleBlogDelete }) => {
             The blog has {blog.likes} likes!{' '}
             <button onClick={handleLike}>Like</button>{' '}
           </p>
-          <p>It was added by {blog.user.name}</p>
+          <p>It was added by {blog.user?.name ?? user.name}</p>
           {blog.user.username === user.username && (
             <div>
               <button onClick={handleBlogDeleteButton}>Delete</button>

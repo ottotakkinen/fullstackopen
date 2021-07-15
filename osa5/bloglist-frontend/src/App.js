@@ -81,16 +81,10 @@ const App = () => {
     setBlogs((prevState) => [...prevState, newBlog]);
   };
 
-  const handleBlogLike = (updatedBlog) => {
-    const updatedBlogIndex = blogs.findIndex(
-      (blog) => blog.id === updatedBlog.id
+  const handleBlogLike = (id) => {
+    const updatedBlogs = blogs.map((blog) =>
+      blog.id === id ? { ...blog, likes: blog.likes + 1 } : blog
     );
-
-    const updatedBlogs = [
-      ...blogs.slice(0, updatedBlogIndex),
-      { ...blogs[updatedBlogIndex], likes: updatedBlog.likes },
-      ...blogs.slice(updatedBlogIndex + 1),
-    ];
 
     setBlogs(updatedBlogs);
   };
