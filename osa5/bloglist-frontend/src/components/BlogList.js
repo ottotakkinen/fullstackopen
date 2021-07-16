@@ -16,7 +16,7 @@ export default function BlogList({
     <div>
       {sortedBlogs.map((blog) => (
         <Blog
-          key={blog.id}
+          key={blog.id ?? blog.title}
           blog={blog}
           user={user}
           handleBlogLike={handleBlogLike}

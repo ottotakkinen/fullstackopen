@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import blogService from '../services/blogs';
+// import blogService from '../services/blogs';
 
-export default function NewBlogForm({ user, handleBlogUpdate }) {
+export default function NewBlogForm({ handleBlogUpdate }) {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [url, setUrl] = useState('');
@@ -21,8 +21,7 @@ export default function NewBlogForm({ user, handleBlogUpdate }) {
       url: url,
     };
 
-    const newBlogPost = await blogService.create(user.token, blogPost);
-    handleBlogUpdate(newBlogPost);
+    handleBlogUpdate(blogPost);
 
     clearInputs();
   };

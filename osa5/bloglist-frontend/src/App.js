@@ -68,26 +68,36 @@ const App = () => {
     setPassword(event.target.value);
   };
 
-  const handleBlogUpdate = (newBlog) => {
-    setNotification({
-      error: false,
-      message: `a new blog ${newBlog.title} by ${newBlog.author} added`,
-    });
+  const handleBlogUpdate = async (newBlog) => {
+    try {
+      setNotification({
+        error: false,
+        message: `a new blog ${newBlog.title} by ${newBlog.author} added`,
+      });
 
-    //toggle visibility of newblogform component / the form to create a blog post
-    newBlogFormRef.current.toggleVisibility();
+      //toggle visibility of newblogform component / the form to create a blog post
+      newBlogFormRef.current.toggleVisibility();
 
-    setTimeout(() => setNotification(initialNotification), 4000);
-    setBlogs((prevState) => [...prevState, newBlog]);
+      setTimeout(() => setNotification(initialNotification), 4000);
+      setBlogs((prevState) => [...prevState, newBlog]);
+
+      await blogService.create(user.token, newBlog);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const handleBlogLike = (newBlog) => {
-    const updatedBlogs = blogs.map((blog) =>
-      blog.id === newBlog.id ? { ...blog, likes: blog.likes + 1 } : blog
-    );
-    setBlogs(updatedBlogs);
+  const handleBlogLike = async (newBlog) => {
+    try {
+      const updatedBlogs = blogs.map((blog) =>
+        blog.id === newBlog.id ? { ...blog, likes: blog.likes + 1 } : blog
+      );
+      setBlogs(updatedBlogs);
 
-    blogService.like(user.token, newBlog);
+      await blogService.like(user.token, newBlog);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleBlogDelete = (deletedBlogId) => {
@@ -124,8 +134,12 @@ const App = () => {
               Logout
             </button>
           </div>
-          <Togglable buttonLabel="Create new blog" ref={newBlogFormRef}>
-            <NewBlogForm user={user} handleBlogUpdate={handleBlogUpdate} />
+          <Togglable
+            id="togglable-newblogform"
+            buttonLabel="Create new blog"
+            ref={newBlogFormRef}
+          >
+            <NewBlogForm handleBlogUpdate={handleBlogUpdate} />
           </Togglable>
           <BlogList
             blogs={blogs}

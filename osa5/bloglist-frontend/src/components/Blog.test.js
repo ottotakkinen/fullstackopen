@@ -45,6 +45,7 @@ test('clicking "like" twice calls its handler function twice', () => {
 
   const user = {
     name: 'testuser',
+    token: 'asdiasd',
   };
 
   const mockHandler = jest.fn();

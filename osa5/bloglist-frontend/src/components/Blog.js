@@ -30,7 +30,7 @@ const Blog = ({ blog, user, handleBlogLike, handleBlogDelete }) => {
   return (
     <div className="blog" style={blogStyle}>
       {blog.title} {blog.author}{' '}
-      <button onClick={toggleDetails}>
+      <button id="btn-blog-view" onClick={toggleDetails}>
         {detailVisibility ? 'Close' : 'View'}
       </button>
       {detailVisibility ? (
@@ -42,12 +42,16 @@ const Blog = ({ blog, user, handleBlogLike, handleBlogDelete }) => {
           </p>
           <p>
             The blog has {blog.likes} likes!{' '}
-            <button onClick={handleLike}>Like</button>{' '}
+            <button id="btn-blog-like" onClick={handleLike}>
+              Like
+            </button>{' '}
           </p>
           <p>It was added by {blog.user?.name ?? user.name}</p>
           {blog.user?.username === user.username && (
             <div>
-              <button onClick={handleBlogDeleteButton}>Delete</button>
+              <button id="btn-blog-delete" onClick={handleBlogDeleteButton}>
+                Delete
+              </button>
             </div>
           )}
         </div>
