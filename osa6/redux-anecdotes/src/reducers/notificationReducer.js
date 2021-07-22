@@ -11,18 +11,27 @@ const reducer = (state = initialState, action) => {
   }
 };
 
-export const setNotification = (message) => {
-  return {
-    type: 'SHOW',
-    data: message,
+export const setNotification = (message, seconds) => {
+  return (dispatch) => {
+    dispatch({ type: 'SHOW', data: message });
+    setTimeout(() => {
+      dispatch({ type: 'CLEAR' });
+    }, seconds * 1000);
   };
 };
 
-export const clearNotification = () => {
-  return {
-    type: 'CLEAR',
-    data: {},
-  };
-};
+// export const setNotification = (message) => {
+//   return {
+//     type: 'SHOW',
+//     data: message,
+//   };
+// };
+
+// export const clearNotification = () => {
+//   return {
+//     type: 'CLEAR',
+//     data: {},
+//   };
+// };
 
 export default reducer;
