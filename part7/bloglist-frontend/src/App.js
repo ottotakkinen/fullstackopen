@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Switch, Route } from 'react-router-dom';
 
 import LoginForm from './components/LoginForm';
 import BlogList from './components/BlogList';
 import NewBlogForm from './components/NewBlogForm';
 import Notification from './components/Notification';
 import Togglable from './components/Togglable';
+import Users from './components/Users';
+import User from './components/User';
 
 // import blogService from './services/blogs';
 import loginService from './services/login';
@@ -118,26 +121,37 @@ const App = () => {
       ) : (
         <React.Fragment>
           <h2>Blogs</h2>
-
           <div className="">
             <p>Logged in as {user.name}</p>
             <button type="button" onClick={handleLogout}>
               Logout
             </button>
           </div>
-          <Togglable
-            id="togglable-newblogform"
-            buttonLabel="Create new blog"
-            ref={newBlogFormRef}
-          >
-            <NewBlogForm handleBlogUpdate={handleBlogUpdate} />
-          </Togglable>
-          <BlogList
-            blogs={blogs}
-            user={user}
-            handleBlogLike={handleBlogLike}
-            handleBlogDelete={handleBlogDelete}
-          />
+          <Switch>
+            <Route exact path="/">
+              <React.Fragment>
+                <Togglable
+                  id="togglable-newblogform"
+                  buttonLabel="Create new blog"
+                  ref={newBlogFormRef}
+                >
+                  <NewBlogForm handleBlogUpdate={handleBlogUpdate} />
+                </Togglable>
+                <BlogList
+                  blogs={blogs}
+                  user={user}
+                  handleBlogLike={handleBlogLike}
+                  handleBlogDelete={handleBlogDelete}
+                />
+              </React.Fragment>
+            </Route>
+            <Route exact path="/users">
+              <Users />
+            </Route>
+            <Route path="/users/:id">
+              <User />
+            </Route>
+          </Switch>
         </React.Fragment>
       )}
     </React.Fragment>
