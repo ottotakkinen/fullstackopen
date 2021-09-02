@@ -1,5 +1,9 @@
 const { ApolloServer, gql } = require('apollo-server');
 const { v4: uuid } = require('uuid');
+require('dotenv').config();
+const mongoose = require('mongoose');
+const Book = require('./models/book');
+const Author = require('./models/author');
 
 let authors = [
   {
@@ -84,11 +88,29 @@ let books = [
   },
 ];
 
+const MONGODB_URI = process.env.MONGODB_URI;
+
+console.log('connecting to', MONGODB_URI);
+
+mongoose
+  .connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  })
+  .then(() => {
+    console.log('connected to MongoDB');
+  })
+  .catch((error) => {
+    console.log('error connection to MongoDB:', error.message);
+  });
+
 const typeDefs = gql`
   type Book {
     title: String!
     published: Int!
-    author: String!
+    author: Author
     genres: [String]!
     id: ID!
   }
@@ -117,51 +139,86 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bookCount: () => books.length,
+    bookCount: () => Book.collection.countDocuments(),
     allBooks: (root, args) => {
+      let filteredBooks;
       if (!args) {
-        return books;
+        filteredBooks = Book.find({}).populate('author');
       }
 
-      let filteredBooks = books;
-      if (args.author) {
-        filteredBooks = filteredBooks.filter((b) => b.author === args.author);
-      }
       if (args.genre) {
-        filteredBooks = filteredBooks.filter((b) =>
-          b.genres.includes(args.genre)
+        filteredBooks = Book.find({ genres: { $in: args.genre } }).populate(
+          'author'
         );
       }
+
       return filteredBooks;
+
+      // let filteredBooks = books;
+      // if (args.author) {
+      //   filteredBooks = filteredBooks.filter((b) => b.author === args.author);
+      // }
+      // if (args.genre) {
+      //   filteredBooks = filteredBooks.filter((b) =>
+      //     b.genres.includes(args.genre)
+      //   );
+      // }
+      // return filteredBooks;
     },
-    authorCount: () => authors.length,
-    allAuthors: () => authors,
+    authorCount: () => Author.collection.countDocuments(),
+    allAuthors: () => Author.find({}),
   },
   Author: {
     name: (root) => root.name,
     id: (root) => root.id,
-    bookCount: (root) => books.filter((b) => b.author === root.name).length,
+    bookCount: (root) => Book.countDocuments({ author: root.id }),
   },
   Mutation: {
-    addBook: (root, args) => {
-      const book = { ...args, id: uuid() };
-      books = books.concat(book);
-      if (!authors.find((a) => a.name === args.author)) {
-        const newAuthor = { name: args.author, id: uuid() };
-        authors = authors.concat(newAuthor);
+    addBook: async (root, args) => {
+      const book = new Book({ ...args });
+
+      try {
+        const foundAuthor = await Author.findOne({ name: args.author });
+        if (!foundAuthor) {
+          const newAuthor = new Author({ name: args.author, id: uuid() });
+          await newAuthor.save();
+          book.author = newAuthor;
+        } else {
+          book.author = foundAuthor;
+        }
+        await book.save();
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        });
       }
+
       return book;
     },
-    editAuthor: (root, args) => {
+    editAuthor: async (root, args) => {
       if (!args.setBornTo || !args.name) {
         return null;
       }
-      const authorToEdit = authors.find((a) => a.name === args.name);
-      editedAuthor = { ...authorToEdit, born: args.setBornTo };
-      authors = authors.map((a) =>
-        a.id === editedAuthor.id ? editedAuthor : a
-      );
-      return editedAuthor;
+
+      try {
+        const authorToEdit = await Author.findOne({ name: args.name });
+
+        const updatedAuthor = await Author.findByIdAndUpdate(
+          authorToEdit.id,
+          {
+            $set: { born: args.setBornTo },
+          },
+          {
+            new: true,
+          }
+        );
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        });
+      }
+
+      return updatedAuthor;
     },
   },
 };
