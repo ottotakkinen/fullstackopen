@@ -79,14 +79,14 @@ const resolvers = {
     bookCount: () => Book.collection.countDocuments(),
     allBooks: (root, args) => {
       let filteredBooks;
-      if (!args) {
+      if (!args.genre && !args.author) {
         filteredBooks = Book.find({}).populate('author');
       }
 
       if (args.genre) {
-        filteredBooks = Book.find({ genres: { $in: args.genre } }).populate(
-          'author'
-        );
+        filteredBooks = Book.find({
+          genres: { $in: args.genre },
+        }).populate('author');
       }
 
       return filteredBooks;
