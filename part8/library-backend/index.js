@@ -173,6 +173,7 @@ const resolvers = {
       const userForToken = {
         username: user.username,
         id: user._id,
+        favoriteGenre: user.favoriteGenre,
       };
 
       return { value: jwt.sign(userForToken, JWT_SECRET) };
