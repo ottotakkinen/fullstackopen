@@ -10,7 +10,10 @@ interface Results {
 
 const ratings = ['work harder boi!', 'good try', 'well done!'];
 
-const calculateExercises = (target: number, hours: number[]): Results => {
+export const calculateExercises = (
+  target: number,
+  hours: number[]
+): Results => {
   const periodLength = hours.length;
   let trainingDays = 0;
   for (let i = 0; i < periodLength; i++) {
@@ -41,7 +44,5 @@ const calculateExercises = (target: number, hours: number[]): Results => {
   };
 };
 
-const target: number = Number(process.argv[2]);
-const hours: number[] = process.argv.slice(3).map(Number);
-
-console.log(calculateExercises(target, hours));
+// const target: number = Number(process.argv[2]);
+// const hours: number[] = process.argv.slice(3).map(Number);

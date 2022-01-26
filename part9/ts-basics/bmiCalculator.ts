@@ -1,6 +1,6 @@
 type Result = string;
 
-const calculateBmi = (height: number, weight: number): Result => {
+export const calculateBmi = (height: number, weight: number): Result => {
   const bmi = weight / (height / 100) ** 2;
   if (bmi >= 40) {
     return 'Obese (Class III)';
@@ -29,6 +29,7 @@ const calculateBmi = (height: number, weight: number): Result => {
   if (bmi < 16) {
     return 'Underweight (Severe thinness)';
   }
+  return 'no bmi calculated';
 };
 
 const a: number = Number(process.argv[2]);
