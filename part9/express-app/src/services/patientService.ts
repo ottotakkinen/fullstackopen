@@ -6,21 +6,24 @@ import {
   NonSensitivePatientEntry,
   NewPatientEntry,
 } from '../types';
+
 import { toNewPatientsEntry } from '../utils/toNewPatientsEntry';
 
 const patients: Array<PatientEntry> = patientData.map((obj) => {
   const object = toNewPatientsEntry(obj) as PatientEntry;
   object.id = obj.id;
+  object.entries = [];
   return object;
 });
 
 const nonSensitivePatients: Array<NonSensitivePatientEntry> = patients.map(
-  ({ id, name, dateOfBirth, gender, occupation }) => ({
+  ({ id, name, dateOfBirth, gender, occupation, entries }) => ({
     id,
     name,
     dateOfBirth,
     gender,
     occupation,
+    entries,
   })
 );
 
@@ -34,7 +37,7 @@ const getNonSensitiveEntries = (): Array<NonSensitivePatientEntry> => {
 
 const addEntry = (entry: NewPatientEntry): PatientEntry => {
   const id: string = uuid();
-  const newPatient = { id, ...entry };
+  const newPatient = { id, ...entry, entries: [] };
   patients.push(newPatient);
   return newPatient;
 };

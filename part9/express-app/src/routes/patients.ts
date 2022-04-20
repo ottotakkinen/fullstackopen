@@ -10,6 +10,12 @@ router.get('/', (_req, res) => {
   res.json(data);
 });
 
+router.get('/:id', (req, res) => {
+  const id = req.params.id;
+  const data = patientService.getEntries().filter((entry) => entry.id === id);
+  res.json(data[0]);
+});
+
 router.post('/', (req, res) => {
   try {
     const newEntry = toNewPatientsEntry(req.body);
