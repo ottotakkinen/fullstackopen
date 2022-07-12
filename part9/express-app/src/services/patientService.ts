@@ -38,8 +38,19 @@ const addEntry = (entry: NewPatientEntry): Patient => {
   return newPatient;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const addEntries = (entry: any): Patient => {
+  patients.map((patient) =>
+    patient.id === entry.id
+      ? { ...patient, entries: [...patient.entries, entry.entry] }
+      : patient
+  );
+  return patients.filter((patient) => patient.id === entry.id)[0];
+};
+
 export default {
   getEntries,
   getNonSensitiveEntries,
   addEntry,
+  addEntries,
 };

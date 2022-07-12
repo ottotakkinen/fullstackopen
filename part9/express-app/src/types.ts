@@ -36,12 +36,15 @@ export interface NewPatientEntry {
 
 export type NonSensitivePatientEntry = Omit<Patient, "ssn" | "entries">;
 
-interface BaseEntry {
+export type EntryType = "HealthCheck" | "Hospital" | "OccupationalHealthcare";
+
+export interface BaseEntry {
   id: string;
   description: string;
   date: string;
   specialist: string;
   diagnosisCodes?: string[];
+  type: EntryType;
 }
 
 export enum HealthCheckRating {
@@ -56,7 +59,7 @@ interface HealthCheckEntry extends BaseEntry {
   healthCheckRating: HealthCheckRating;
 }
 
-type Discharge = {
+export type Discharge = {
   date: string;
   criteria: string;
 };
@@ -65,7 +68,7 @@ interface HospitalEntry extends BaseEntry {
   discharge: Discharge;
 }
 
-type SickLeave = {
+export type SickLeave = {
   startDate: string;
   endDate: string;
 };
