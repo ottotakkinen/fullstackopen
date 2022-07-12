@@ -1,18 +1,14 @@
-import { v4 as uuid } from 'uuid';
-import patientData from '../../data/patients.json';
+import { v4 as uuid } from "uuid";
+import patientData from "../../data/patients";
 
-import {
-  PatientEntry,
-  NonSensitivePatientEntry,
-  NewPatientEntry,
-} from '../types';
+import { Patient, NonSensitivePatientEntry, NewPatientEntry } from "../types";
 
-import { toNewPatientsEntry } from '../utils/toNewPatientsEntry';
+import { toNewPatientsEntry } from "../utils/toNewPatientsEntry";
 
-const patients: Array<PatientEntry> = patientData.map((obj) => {
-  const object = toNewPatientsEntry(obj) as PatientEntry;
+const patients: Array<Patient> = patientData.map((obj) => {
+  const object = toNewPatientsEntry(obj) as Patient;
   object.id = obj.id;
-  object.entries = [];
+  object.entries = obj.entries;
   return object;
 });
 
@@ -27,7 +23,7 @@ const nonSensitivePatients: Array<NonSensitivePatientEntry> = patients.map(
   })
 );
 
-const getEntries = (): Array<PatientEntry> => {
+const getEntries = (): Array<Patient> => {
   return patients;
 };
 
@@ -35,7 +31,7 @@ const getNonSensitiveEntries = (): Array<NonSensitivePatientEntry> => {
   return nonSensitivePatients;
 };
 
-const addEntry = (entry: NewPatientEntry): PatientEntry => {
+const addEntry = (entry: NewPatientEntry): Patient => {
   const id: string = uuid();
   const newPatient = { id, ...entry, entries: [] };
   patients.push(newPatient);
