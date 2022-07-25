@@ -17,6 +17,10 @@ export type Action =
   | {
       type: "SET_DIAGNOSES";
       payload: Diagnosis[];
+    }
+  | {
+      type: "ADD_ENTRY";
+      payload: Diagnosis[];
     };
 
 export const reducer = (state: State, action: Action): State => {
@@ -72,4 +76,8 @@ export const updatePatientData = (patient: Patient): Action => {
 
 export const setDiagnoses = (diagnoses: Diagnosis[]): Action => {
   return { type: "SET_DIAGNOSES", payload: diagnoses };
+};
+
+export const addEntry = (diagnoses: Diagnosis[]): Action => {
+  return { type: "ADD_ENTRY", payload: diagnoses };
 };

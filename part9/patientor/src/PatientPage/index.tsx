@@ -1,15 +1,19 @@
-import React, { useState } from "react";
+import { Button } from "@material-ui/core";
 import axios from "axios";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import AddEntryModal from "../AddEntryModal";
+import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
+import EntryDetails from "../components/EntryDetails";
+import { apiBaseUrl } from "../constants";
 import { setDiagnoses, updatePatientData, useStateValue } from "../state";
 import { Diagnosis, Patient } from "../types";
-import { apiBaseUrl } from "../constants";
-import EntryDetails from "../components/EntryDetails";
 
 const PatientPage = () => {
   const { id } = useParams<{ id: string }>();
   const [{ patients }, dispatch] = useStateValue();
   const [loading, setLoading] = useState<boolean>(true);
+  const [modalOpen, setModalOpen] = useState(false);
 
   React.useEffect(() => {
     if (id && Object.values(patients).length !== 0 && !patients[id].ssn) {
@@ -46,8 +50,24 @@ const PatientPage = () => {
 
   const patient = patients[id];
 
+  const handleSubmitEntry = async (diagnosisEntry: EntryFormValues) => {
+    console.log(diagnosisEntry);
+    const result = await axios.post(`${apiBaseUrl}/patients/${id}/entries`, {
+      ...diagnosisEntry,
+      id: id,
+    });
+    console.log(result);
+  };
+
   return (
     <>
+      {modalOpen && (
+        <AddEntryModal
+          modalOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSubmit={handleSubmitEntry}
+        />
+      )}
       {patient ? (
         <div>
           <h2>{patient.name}</h2>
@@ -58,6 +78,9 @@ const PatientPage = () => {
           {patient?.entries.map((entry) => (
             <EntryDetails key={entry.id} entry={entry} />
           ))}
+          <Button variant="outlined" onClick={() => setModalOpen(true)}>
+            Add entry
+          </Button>
         </div>
       ) : (
         <div>loading</div>

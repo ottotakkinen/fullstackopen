@@ -1,6 +1,7 @@
 import express from "express";
 import { v4 as uuid } from "uuid";
 import patientService from "../services/patientService";
+import { Entry } from "../types";
 
 import { toNewPatientsEntry } from "../utils/toNewPatientsEntry";
 
@@ -19,7 +20,10 @@ router.get("/:id", (req, res) => {
 
 router.post("/:id/entries", (req, res) => {
   try {
-    const entry = patientService.addEntries({ ...req.body, id: uuid() });
+    const entry = patientService.addEntries({
+      entry: { ...req.body } as Entry,
+      id: uuid(),
+    });
     res.json(entry);
   } catch (error) {
     let errorMessage = "Something went wrong.";

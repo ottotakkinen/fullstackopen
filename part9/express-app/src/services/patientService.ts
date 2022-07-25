@@ -1,7 +1,12 @@
 import { v4 as uuid } from "uuid";
 import patientData from "../../data/patients";
 
-import { Patient, NonSensitivePatientEntry, NewPatientEntry } from "../types";
+import {
+  Patient,
+  NonSensitivePatientEntry,
+  NewPatientEntry,
+  Entry,
+} from "../types";
 
 import { toNewPatientsEntry } from "../utils/toNewPatientsEntry";
 
@@ -38,14 +43,24 @@ const addEntry = (entry: NewPatientEntry): Patient => {
   return newPatient;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const addEntries = (entry: any): Patient => {
-  patients.map((patient) =>
-    patient.id === entry.id
-      ? { ...patient, entries: [...patient.entries, entry.entry] }
+type entryDataType = {
+  entry: Entry;
+  id: string;
+};
+
+const addEntries = (data: entryDataType): Patient => {
+  const newPatients = patients.map((patient) =>
+    patient.id === data.entry.id
+      ? {
+          ...patient,
+          entries: [...patient.entries, { ...data.entry, id: data.id }],
+        }
       : patient
   );
-  return patients.filter((patient) => patient.id === entry.id)[0];
+  console.log(data);
+  console.log("------------------------------------");
+  console.log(newPatients.filter((patient) => patient.id === data.entry.id)[0]);
+  return newPatients.filter((patient) => patient.id === data.entry.id)[0];
 };
 
 export default {
